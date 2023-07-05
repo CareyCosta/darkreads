@@ -40,6 +40,15 @@ export const createBulkCategoryEntries = async ({
   return response.data;
 };
 
+export const getAllCategories = async () => {
+  const localInstance = axios.create({
+    baseURL: "http://localhost:5000",
+  });
+
+  const response = await localInstance.get(`/api/category`);
+  return response.data;
+};
+
 export const addCategoriesToBook = async (
   bookId: string,
   categories: AxiosResponse<any, any>
@@ -75,7 +84,7 @@ export const getLocalBooks = async () => {
 
   const response = await localInstance.get(`/api/books/`);
 
-  // return response;
+  return response;
 };
 
 // google api requests

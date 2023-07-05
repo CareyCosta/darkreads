@@ -18,10 +18,7 @@ exports.create = (req, res) => {
 };
 
 exports.bulkCreate = (req, res) => {
-  Category.bulkCreate(
-    req.body.categories,
-    { validate: true, fields: ['name'] }
-  )
+  Category.bulkCreate(req.body.categories, { validate: true, fields: ['name'] })
     .then((data) => {
       res.send(data);
     })
@@ -57,24 +54,15 @@ exports.addBook = (categoryId, bookId) => {
     });
 };
 
-exports.findAll = () => {
-  return Category.findAll({
-    include: [
-      {
-        model: Book,
-        as: 'books',
-        attributes: ['id', 'title', 'description'],
-        through: {
-          attributes: [],
-        },
-      },
-    ],
-  })
-    .then((categorys) => {
-      return categorys;
+exports.findAll = (req, res) => {
+  return Category.findAll()
+    .then((data) => {
+      res.send(data);
     })
     .catch((err) => {
-      console.log('>> Error while retrieving Categorys: ', err);
+      res.status(500).send({
+        message: err.message || 'Some error occurred while fetching Categories',
+      });
     });
 };
 

@@ -1,11 +1,11 @@
 import { Modal } from "../../BuildingBlocks/Modal/Modal";
 import { BookModalProps } from "./types";
 
-import {
-  createBookEntry,
-} from "../repository";
+import { createBookEntry, getAllCategories } from "../repository";
 
 import styles from "./BookModal.module.scss";
+import { CategoryPicker } from "../../BuildingBlocks/MultiSelect";
+import { useEffect, useState } from "react";
 
 const {
   bookModalWrapper,
@@ -32,6 +32,17 @@ const handleAddToDB = async (params: {
 };
 
 export const BookModal = ({ handleShowModal, book }: BookModalProps) => {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const getCategories = async () => {
+      const categoriesResponse = await getAllCategories();
+      setCategories(categoriesResponse);
+    };
+
+    getCategories();
+  }, []);
+
   return (
     <Modal handleClose={() => handleShowModal(null)}>
       <div className={bookModalWrapper}>
@@ -39,25 +50,7 @@ export const BookModal = ({ handleShowModal, book }: BookModalProps) => {
           <div className={bookTitle}>{book?.title}</div>
           <div>{book?.authors}</div>
           <div className={bookDescription}>{book?.description}</div>
-          <form>
-            <label htmlFor="categories">Categories</label>
-            <input type="text" list="categories" />
-            <datalist id="categories">
-              <option>Google</option>
-              <option>IE9</option>
-            </datalist>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                handleAddToDB({
-                  googleId: book?.id,
-                  categories: ["Erotica", "New Adult", "Suspense"],
-                });
-              }}
-            >
-              Add to DB
-            </button>
-          </form>
+          <CategoryPicker />
         </div>
         <div className={imageContainer}>
           <img src={book?.imageLink} />
