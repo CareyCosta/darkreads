@@ -1,16 +1,27 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { BookProps } from "./types";
 
 // local requests
 
-export const createBookEntry = async ({ googleId }: { googleId: string }) => {
+export const createBookEntry = async ({
+  googleId,
+  categories,
+}: {
+  googleId: string;
+  categories: string[];
+}) => {
   const localInstance = axios.create({
     baseURL: "http://localhost:5000",
   });
 
-  return await localInstance.post(`/api/book/`, {
+  const response = await localInstance.post(`/api/book/`, {
     googleId,
+    categories: categories.map((c) => ({
+      name: c,
+    })),
   });
+
+  return response.data;
 };
 
 export const createBulkCategoryEntries = async ({
@@ -18,14 +29,28 @@ export const createBulkCategoryEntries = async ({
 }: {
   categories: string[];
 }) => {
-  console.log("categories????", categories);
-
   const localInstance = axios.create({
     baseURL: "http://localhost:5000",
   });
 
-  return await localInstance.post(`/api/category/bulk/`, {
+  const response = await localInstance.post(`/api/category/bulk/`, {
     categories: categories.map((c) => ({ name: c })),
+  });
+
+  return response.data;
+};
+
+export const addCategoriesToBook = async (
+  bookId: string,
+  categories: AxiosResponse<any, any>
+) => {
+  const localInstance = axios.create({
+    baseURL: "http://localhost:5000",
+  });
+
+  return await localInstance.post(`/api/book/addCategories`, {
+    categories,
+    bookId,
   });
 };
 

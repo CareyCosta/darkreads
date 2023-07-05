@@ -18,8 +18,6 @@ exports.create = (req, res) => {
 };
 
 exports.bulkCreate = (req, res) => {
-  console.log('req', req.body.categories);
-
   Category.bulkCreate(
     req.body.categories,
     { validate: true, fields: ['name'] }
@@ -31,6 +29,31 @@ exports.bulkCreate = (req, res) => {
       res.status(500).send({
         message: err.message || 'Some error occurred while creating the Book.',
       });
+    });
+};
+
+exports.addBook = (categoryId, bookId) => {
+  return Category.findByPk(categoryId)
+    .then((category) => {
+      if (!category) {
+        console.log('Category not found!');
+        return null;
+      }
+      return Book.findByPk(bookId).then((book) => {
+        if (!book) {
+          console.log('Book not found!');
+          return null;
+        }
+
+        category.addBook(book);
+        console.log(
+          `>> added Book id=${book.id} to Category id=${category.id}`
+        );
+        return category;
+      });
+    })
+    .catch((err) => {
+      console.log('>> Error while adding Book to Category: ', err);
     });
 };
 
@@ -73,30 +96,5 @@ exports.findById = (id) => {
     })
     .catch((err) => {
       console.log('>> Error while finding Category: ', err);
-    });
-};
-
-exports.addBook = (categoryId, bookId) => {
-  return Category.findByPk(categoryId)
-    .then((category) => {
-      if (!category) {
-        console.log('Category not found!');
-        return null;
-      }
-      return Book.findByPk(bookId).then((book) => {
-        if (!book) {
-          console.log('Book not found!');
-          return null;
-        }
-
-        category.addBook(book);
-        console.log(
-          `>> added Book id=${book.id} to Category id=${category.id}`
-        );
-        return category;
-      });
-    })
-    .catch((err) => {
-      console.log('>> Error while adding Book to Category: ', err);
     });
 };

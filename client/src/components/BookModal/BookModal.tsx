@@ -1,7 +1,9 @@
 import { Modal } from "../../BuildingBlocks/Modal/Modal";
 import { BookModalProps } from "./types";
 
-import { createBookEntry, createCategoryEntry, createBulkCategoryEntries } from "../repository";
+import {
+  createBookEntry,
+} from "../repository";
 
 import styles from "./BookModal.module.scss";
 
@@ -20,16 +22,13 @@ const handleAddToDB = async (params: {
   if (!params.googleId || !params.categories.length) {
     return;
   }
-  const newBook = await createBookEntry({ googleId: params.googleId });
-  // const newcategory = await createCategoryEntry({
-  //   categoryName: params.categories[0],
-  // });
 
-  const newCategory = await createBulkCategoryEntries({
+  const newBook = await createBookEntry({
+    googleId: params.googleId,
     categories: params.categories,
   });
 
-  return { newBook, newCategory };
+  return { newBook };
 };
 
 export const BookModal = ({ handleShowModal, book }: BookModalProps) => {
@@ -50,7 +49,10 @@ export const BookModal = ({ handleShowModal, book }: BookModalProps) => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                handleAddToDB({ googleId: book?.id, categories: ["Erotica", "New Adult", "Suspense"] });
+                handleAddToDB({
+                  googleId: book?.id,
+                  categories: ["Erotica", "New Adult", "Suspense"],
+                });
               }}
             >
               Add to DB

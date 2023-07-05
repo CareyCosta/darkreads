@@ -15,12 +15,18 @@ exports.create = (req, res) => {
   }
 
   // Create a Book
-  const book = {
+  const params = {
     googleId: req.body.googleId,
+    categories: req.body.categories,
   };
 
   // Save Book in the database
-  Book.create(book)
+  Book.create(
+    { googleId: params.googleId, categories: params.categories },
+    {
+      include: [{ association: Book.categories }],
+    }
+  )
     .then((data) => {
       res.send(data);
     })
@@ -150,27 +156,40 @@ exports.findAllPublished = (req, res) => {
     });
 };
 
-// exports.addCategory = (categoryId, bookId) => {
-//   return Book.findByPk(bookId)
-//     .then((book) => {
-//       if (!book) {
-//         console.log('Book not found!');
-//         return null;
-//       }
-//       return Category.findByPk(categoryId).then((category) => {
-//         if (!category) {
-//           console.log('Category not found!');
-//           return null;
-//         }
+// exports.addCategories = async (req, res) => {
+//   const { categories, bookId } = req.body;
 
-//         book.addCategory(category);
-//         console.log(
-//           `>> added Category id=${category.id} to Book id=${book.id}`
-//         );
-//         return category;
-//       });
-//     })
-//     .catch((err) => {
-//       console.log('>> Error while adding Category to Book: ', err);
+//   console.log('categories', categories);
+//   console.log('bookId', bookId);
+//   // return Book.findByPk(bookId)
+//   //   .then((book) => {
+//   //     if (!book) {
+//   //       console.log('Book not found!');
+//   //       return null;
+//   //     }
+//   //     return Category.findByPk(categoryId).then((category) => {
+//   //       if (!category) {
+//   //         console.log('Category not found!');
+//   //         return null;
+//   //       }
+
+//   //       book.addCategory(category);
+//   //       console.log(
+//   //         `>> added Category id=${category.id} to Book id=${book.id}`
+//   //       );
+//   //       return category;
+//   //     });
+//   //   })
+//   //   .catch((err) => {
+//   //     console.log('>> Error while adding Category to Book: ', err);
+//   //   });
+//   try {
+//     const book = Book.findByPk(bookId);
+//     categories.forEach((cat) => {
+//       book.addCategories(cat);
 //     });
+//     res.send({ book });
+//   } catch (e) {
+//     console.error(e);
+//   }
 // };
