@@ -1,0 +1,37 @@
+.bookModalWrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bookInfoWrapper {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+}
+
+.bookTitle {
+  font-size: 20px;
+  font-family: Helvetica, Times New Roman;
+}
+
+.bookDescription {
+  font-size: 14px;
+  line-height: 1.5;
+  max-height: 200px;
+  overflow: scroll;
+  max-width: 500px;
+  margin-right: 2rem;
+  margin-bottom: 2rem;
+}
+
+.imageContainer {
+  height: 180px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  object-fit: cover;
+  max-height: 100%;
+}

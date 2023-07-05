@@ -1,0 +1,22 @@
+@import "../../sass/mixins/text";
+
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
+  @include headerText;
+}
+
+.inputWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.searchButton {
+  background-color: black;
+  border-color: black;
+  font-size: 20px;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}

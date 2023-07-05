@@ -1,0 +1,44 @@
+.booksContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  row-gap: 2rem;
+  margin-top: 3rem;
+}
+
+.bookItem {
+  display: flex;
+  justify-content: space-between;
+  width: 30%;
+}
+
+// re-use
+.bookInfoWrapper {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+}
+
+// re-use
+.bookTitle {
+  font-size: 20px;
+  font-family: Helvetica, Times New Roman;
+}
+
+.bookDescription {
+  font-size: 14px;
+  line-height: 1.5;
+  max-height: 200px;
+  overflow: scroll;
+  padding-right: 2rem;
+}
+
+.imageContainer {
+  height: 180px;
+  text-align: center;
+}
+
+img {
+  object-fit: cover;
+  max-height: 100%;
+}
