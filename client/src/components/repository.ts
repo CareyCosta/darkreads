@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { BookProps, CategoryOption } from "./types";
+import { BookProps, CategoryProps } from "./types";
 
 // local requests
 
@@ -8,7 +8,7 @@ export const createBookEntry = async ({
   categories,
 }: {
   googleId: string;
-  categories: CategoryOption[];
+  categories: CategoryProps[];
 }) => {
   const localInstance = axios.create({
     baseURL: "http://localhost:5000",

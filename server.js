@@ -25,8 +25,8 @@ const db = require('./db.js');
 //   console.log("Drop and re-sync db.");
 // });
 
-require("./book.routes.js")(app);
-require("./category.routes.js")(app);
+require("./routes/book.routes.js")(app);
+require("./routes/category.routes.js")(app);
 
 // This displays message that the server running and listening to specified port
 app.listen(port, () => console.log(`Listening on port ${port}`));

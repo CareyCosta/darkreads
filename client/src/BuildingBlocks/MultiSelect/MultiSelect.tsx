@@ -1,33 +1,24 @@
 import { useCombobox, useMultipleSelection } from "downshift";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
-import {
-  createBulkCategoryEntries,
-  getAllCategories,
-} from "../components/repository";
-
-type CategoryOption = { [key: string]: string };
+type Option = { id: string | null; name: string };
 
 type MultiSelectProps = {
-  altButtonFunc?: ({ name }: { name: string }) => Promise<void>;
-  options: CategoryOption[];
-  setCategoryOptions: Dispatch<SetStateAction<CategoryOption[]>>;
-  values: CategoryOption[] | undefined;
+  options: Option[];
+  setOptions?: Dispatch<SetStateAction<Option[]>>;
+  values: Option[] | undefined;
   name: string;
-  onChange: (newValues: CategoryOption[]) => void;
+  onChange: (newValues: Option[]) => void;
 };
 
-const searchFunction = (
-  option: CategoryOption,
-  inputValue: string
-): boolean => {
+const searchFunction = (option: Option, inputValue: string): boolean => {
   const lowerCasedInputValue = inputValue.toLowerCase();
   return option.name.toLowerCase().includes(lowerCasedInputValue);
 };
 
-const MultiSelect = ({
+export const MultiSelect = ({
   options,
-  setCategoryOptions,
+  setOptions,
   values,
   name,
   onChange,
@@ -113,9 +104,10 @@ const MultiSelect = ({
     },
   });
 
-  const addNewCategoryOption = (optionName: string): void => {
-    setSelectedItems([...selectedItems, { name: optionName }]);
-    setCategoryOptions((prev) => [...prev, { name: optionName }]);
+  const addNewOption = (option: Option): void => {
+    const { id, name } = option;
+    setSelectedItems([...selectedItems, { id, name }]);
+    setOptions?.((prev) => [...prev, { id, name }]);
     setInputValue("");
     openMenu();
   };
@@ -157,7 +149,9 @@ const MultiSelect = ({
               {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
             />
             {inputValue && !items.length ? (
-              <button onClick={() => addNewCategoryOption(inputValue)}>
+              <button
+                onClick={() => addNewOption?.({ id: null, name: inputValue })}
+              >
                 +
               </button>
             ) : (
@@ -181,54 +175,11 @@ const MultiSelect = ({
       >
         {isOpen &&
           items.map((item, index) => (
-            <li
-              key={`${item.value}${index}`}
-              {...getItemProps({ item, index })}
-            >
+            <li key={`${item.id}${index}`} {...getItemProps({ item, index })}>
               <span>{item.name}</span>
             </li>
           ))}
       </ul>
     </div>
-  );
-};
-
-type CategoryPickerProps = {
-  onChange: (newValues: CategoryOption[]) => void;
-  name: string;
-  values: CategoryOption[];
-};
-
-export const CategoryPicker = ({
-  onChange,
-  name,
-  values,
-}: CategoryPickerProps) => {
-  const [options, setCategoryOptions] = useState<CategoryOption[]>([]);
-
-  useEffect(() => {
-    const getCategories = async () => {
-      const categoriesResponse = await getAllCategories();
-      setCategoryOptions(categoriesResponse);
-    };
-
-    getCategories();
-  }, []);
-
-  //   const createBulkCategories = async ({ name }: { name: string }) => {
-  //     const response = await createBulkCategoryEntries({
-  //       categories: name,
-  //     });
-  //     setCategoryOptions((prev) => [...prev, response.data]);
-  //   };
-
-  return (
-    <MultiSelect
-      options={options}
-      setCategoryOptions={setCategoryOptions}
-      values={values}
-      name={name}
-      onChange={onChange}
-    />
   );
 };

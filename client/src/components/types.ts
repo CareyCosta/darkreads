@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
 
-export type CategoryOption = { [key: string]: string };
+export type CategoryProps = { id: string | null; name: string };
 
 export type LocalBookProps = {
   id: string;
   googleId: string;
-  categories: CategoryOption[];
+  categories: CategoryProps[];
 } | null;
 
 export interface BookProps {
@@ -13,7 +13,7 @@ export interface BookProps {
   title: string;
   authors: string[];
   description: string;
-  categories: string[];
+  categories: CategoryProps[];
   publishedDate: Date;
   previewLink: string;
   imageLink: string;
@@ -31,4 +31,9 @@ export type SortConfigProps = {
 export type SearchHeaderProps = {
   handleSetBooks: Dispatch<SetStateAction<BookProps[]>>;
   books: BookProps[];
+};
+
+export type BookModalProps = {
+  handleShowModal: Dispatch<SetStateAction<string | null>>;
+  book: BookProps | undefined;
 };

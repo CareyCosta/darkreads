@@ -1,6 +1,6 @@
 // const db = require('./category.model.js');
 const { where } = require('sequelize');
-const db = require('./db');
+const db = require('../db');
 const Book = db.book;
 const Category = db.category;
 

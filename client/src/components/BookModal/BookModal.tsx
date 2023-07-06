@@ -1,13 +1,11 @@
-import { useFormik, FormikProps } from "formik";
 import { Modal } from "../../BuildingBlocks/Modal/Modal";
-import { BookModalProps } from "./types";
-import { CategoryOption, LocalBookProps } from "../types";
+import { BookActionsForm } from "./BookActionsForm";
+import { LocalBookProps, BookModalProps } from "../types";
 
-import { createBookEntry, getLocalBook } from "../repository";
+import { getLocalBook } from "../repository";
 
 import styles from "./BookModal.module.scss";
-import { CategoryPicker } from "../../BuildingBlocks/MultiSelect";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const {
   bookModalWrapper,
@@ -17,22 +15,6 @@ const {
   imageContainer,
 } = styles;
 
-const handleAddToDB = async (params: {
-  googleId: string | undefined;
-  categories: CategoryOption[];
-}) => {
-  if (!params.googleId || !params.categories.length) {
-    return;
-  }
-
-  const newBook = await createBookEntry({
-    googleId: params.googleId,
-    categories: params.categories,
-  });
-
-  return { newBook };
-};
-
 export const BookModal = ({ handleShowModal, book }: BookModalProps) => {
   const [localBook, setLocalBook] = useState<LocalBookProps>(null);
   const [isPending, setIsPending] = useState(false);
@@ -41,60 +23,47 @@ export const BookModal = ({ handleShowModal, book }: BookModalProps) => {
     if (!book) {
       return;
     }
-    const handleGetFromDB = async (bookId: string) => {
+    const handleGetLocalBook = async (bookId: string) => {
       setIsPending(true);
-      const response = await getLocalBook(bookId);
+      try {
+        const response = await getLocalBook(bookId);
+        setLocalBook(response.data);
+      } catch (e) {
+        console.log(e);
+      }
       setIsPending(false);
-      setLocalBook(response.data);
     };
-    handleGetFromDB(book.id);
+    handleGetLocalBook(book.id);
   }, [book]);
 
-  const initialValues: {
-    googleId: string | undefined;
-    categories: Record<string, string>[];
-  } = {
-    googleId: book?.id,
-    categories: localBook?.categories || [],
-  };
-  const formik = useFormik({
-    initialValues,
-    onSubmit: (values) => handleAddToDB(values),
-  });
-
-  console.log(formik);
-
-  const handleCategorySelect = (newValues: CategoryOption[]) => {
-    formik.setFieldValue("categories", newValues);
-  };
-
   return (
-    <Modal handleClose={() => handleShowModal(null)}>
-      {!book ? (
-        <div>no book</div>
-      ) : (
-        <div className={bookModalWrapper}>
-          <div className={bookInfoWrapper}>
-            <div className={bookTitle}>{book.title}</div>
-            <div>{book?.authors}</div>
-            <div className={bookDescription}>{book.description}</div>
-            <form onSubmit={formik.handleSubmit}>
-              <CategoryPicker
-                name="categories"
-                values={localBook?.categories || []}
-                onChange={handleCategorySelect}
-              />
-              <button type="submit">Submit</button>
-            </form>
-          </div>
-          <div className={imageContainer}>
-            <img src={book.imageLink} />
-            <a href={book.previewLink} target="_blank">
-              View in Google Books
-            </a>
-          </div>
-        </div>
+    <>
+      {!isPending && (
+        <Modal handleClose={() => handleShowModal(null)}>
+          {!book ? (
+            <div>no book</div>
+          ) : (
+            <div className={bookModalWrapper}>
+              <div className={bookInfoWrapper}>
+                <div className={bookTitle}>{book.title}</div>
+                <div>{book?.authors}</div>
+                <div className={bookDescription}>{book.description}</div>
+                <BookActionsForm
+                  googleBookId={book?.id}
+                  bookId={localBook?.id}
+                  categories={localBook?.categories}
+                />
+              </div>
+              <div className={imageContainer}>
+                <img src={book.imageLink} />
+                <a href={book.previewLink} target="_blank">
+                  View in Google Books
+                </a>
+              </div>
+            </div>
+          )}
+        </Modal>
       )}
-    </Modal>
+    </>
   );
 };
