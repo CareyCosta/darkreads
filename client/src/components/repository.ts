@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { BookProps } from "./types";
+import { BookProps, CategoryOption } from "./types";
 
 // local requests
 
@@ -8,7 +8,7 @@ export const createBookEntry = async ({
   categories,
 }: {
   googleId: string;
-  categories: string[];
+  categories: CategoryOption[];
 }) => {
   const localInstance = axios.create({
     baseURL: "http://localhost:5000",
@@ -16,9 +16,7 @@ export const createBookEntry = async ({
 
   const response = await localInstance.post(`/api/book/`, {
     googleId,
-    categories: categories.map((c) => ({
-      name: c,
-    })),
+    categories,
   });
 
   return response.data;
@@ -84,6 +82,16 @@ export const getLocalBooks = async () => {
   });
 
   const response = await localInstance.get(`/api/books/`);
+
+  return response;
+};
+
+export const getLocalBook = async (bookId: string) => {
+  const localInstance = axios.create({
+    baseURL: "http://localhost:5000",
+  });
+
+  const response = await localInstance.get(`/api/book/googleId/${bookId}`);
 
   return response;
 };

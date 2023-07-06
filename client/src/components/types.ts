@@ -1,5 +1,13 @@
 import { Dispatch, SetStateAction } from "react";
 
+export type CategoryOption = { [key: string]: string };
+
+export type LocalBookProps = {
+  id: string;
+  googleId: string;
+  categories: CategoryOption[];
+} | null;
+
 export interface BookProps {
   id: string;
   title: string;

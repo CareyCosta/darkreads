@@ -1,4 +1,5 @@
 // const db = require('./category.model.js');
+const { where } = require('sequelize');
 const db = require('./db');
 const Book = db.book;
 const Category = db.category;
@@ -82,6 +83,16 @@ exports.findById = (id) => {
       },
     ],
   })
+    .then((category) => {
+      return category;
+    })
+    .catch((err) => {
+      console.log('>> Error while finding Category: ', err);
+    });
+};
+
+exports.findByGoogleId = (bookId) => {
+  return Category.findAll({ where: { bookId: bookId } })
     .then((category) => {
       return category;
     })

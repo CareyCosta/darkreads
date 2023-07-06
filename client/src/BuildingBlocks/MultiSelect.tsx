@@ -1,60 +1,65 @@
 import { useCombobox, useMultipleSelection } from "downshift";
-import {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-  useRef,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
 import {
   createBulkCategoryEntries,
   getAllCategories,
 } from "../components/repository";
 
-type Option = { [key: string]: string };
+type CategoryOption = { [key: string]: string };
 
 type MultiSelectProps = {
   altButtonFunc?: ({ name }: { name: string }) => Promise<void>;
-  options: Option[];
-  setOptions: Dispatch<SetStateAction<Option[]>>;
-  values: Option[] | undefined;
+  options: CategoryOption[];
+  setCategoryOptions: Dispatch<SetStateAction<CategoryOption[]>>;
+  values: CategoryOption[] | undefined;
+  name: string;
+  onChange: (newValues: CategoryOption[]) => void;
 };
 
-const searchFunction = (option: Option, inputValue: string): boolean => {
+const searchFunction = (
+  option: CategoryOption,
+  inputValue: string
+): boolean => {
   const lowerCasedInputValue = inputValue.toLowerCase();
   return option.name.toLowerCase().includes(lowerCasedInputValue);
 };
 
-const MultiSelect = ({ options, setOptions, values }: MultiSelectProps) => {
+const MultiSelect = ({
+  options,
+  setCategoryOptions,
+  values,
+  name,
+  onChange,
+}: MultiSelectProps) => {
   const [inputValue, setInputValue] = useState<string>("");
-  const [selectedItems, setSelectedItems] = useState<Option[]>(values || []);
 
   const items = useMemo(() => {
     return options.filter((o) => searchFunction(o, inputValue));
   }, [options, inputValue]);
 
-  const { getSelectedItemProps, getDropdownProps, removeSelectedItem } =
-    useMultipleSelection({
-      selectedItems,
-      onStateChange({ selectedItems: newSelectedItems, type }) {
-        switch (type) {
-          case useMultipleSelection.stateChangeTypes
-            .SelectedItemKeyDownBackspace:
-          case useMultipleSelection.stateChangeTypes.SelectedItemKeyDownDelete:
-          case useMultipleSelection.stateChangeTypes.DropdownKeyDownBackspace:
-          // case useMultipleSelection.stateChangeTypes.FunctionSetSelectedItems:
-          case useMultipleSelection.stateChangeTypes.FunctionRemoveSelectedItem:
-            if (newSelectedItems) {
-              setSelectedItems(newSelectedItems);
-            }
-            break;
-          default:
-            break;
-        }
-      },
-    });
+  const {
+    getSelectedItemProps,
+    getDropdownProps,
+    removeSelectedItem,
+    selectedItems,
+    setSelectedItems,
+  } = useMultipleSelection({
+    initialSelectedItems: values,
+    onStateChange({ selectedItems: newSelectedItems, type }) {
+      switch (type) {
+        case useMultipleSelection.stateChangeTypes.SelectedItemKeyDownBackspace:
+        case useMultipleSelection.stateChangeTypes.SelectedItemKeyDownDelete:
+        case useMultipleSelection.stateChangeTypes.DropdownKeyDownBackspace:
+        case useMultipleSelection.stateChangeTypes.FunctionSetSelectedItems:
+        case useMultipleSelection.stateChangeTypes.FunctionRemoveSelectedItem:
+          onChange(newSelectedItems || []);
+          break;
+        default:
+          break;
+      }
+    },
+  });
 
   const {
     isOpen,
@@ -65,6 +70,7 @@ const MultiSelect = ({ options, setOptions, values }: MultiSelectProps) => {
     getItemProps,
     openMenu,
   } = useCombobox({
+    id: name,
     selectedItem: null,
     items,
     itemToString(item) {
@@ -73,7 +79,6 @@ const MultiSelect = ({ options, setOptions, values }: MultiSelectProps) => {
     inputValue,
     stateReducer(state, actionAndChanges) {
       const { changes, type } = actionAndChanges;
-
       switch (type) {
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
@@ -108,9 +113,9 @@ const MultiSelect = ({ options, setOptions, values }: MultiSelectProps) => {
     },
   });
 
-  const addNewOption = (optionName: string): void => {
-    setSelectedItems((prev) => [...prev, { name: optionName }]);
-    setOptions((prev) => [...prev, { name: optionName }]);
+  const addNewCategoryOption = (optionName: string): void => {
+    setSelectedItems([...selectedItems, { name: optionName }]);
+    setCategoryOptions((prev) => [...prev, { name: optionName }]);
     setInputValue("");
     openMenu();
   };
@@ -152,7 +157,9 @@ const MultiSelect = ({ options, setOptions, values }: MultiSelectProps) => {
               {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
             />
             {inputValue && !items.length ? (
-              <button onClick={() => addNewOption(inputValue)}>+</button>
+              <button onClick={() => addNewCategoryOption(inputValue)}>
+                +
+              </button>
             ) : (
               <button
                 aria-label="toggle menu"
@@ -186,14 +193,23 @@ const MultiSelect = ({ options, setOptions, values }: MultiSelectProps) => {
   );
 };
 
-export const CategoryPicker = () => {
-  const [options, setOptions] = useState<Option[]>([]);
-  const [values, setValues] = useState<Option[] | undefined>();
+type CategoryPickerProps = {
+  onChange: (newValues: CategoryOption[]) => void;
+  name: string;
+  values: CategoryOption[];
+};
+
+export const CategoryPicker = ({
+  onChange,
+  name,
+  values,
+}: CategoryPickerProps) => {
+  const [options, setCategoryOptions] = useState<CategoryOption[]>([]);
 
   useEffect(() => {
     const getCategories = async () => {
       const categoriesResponse = await getAllCategories();
-      setOptions(categoriesResponse);
+      setCategoryOptions(categoriesResponse);
     };
 
     getCategories();
@@ -203,10 +219,16 @@ export const CategoryPicker = () => {
   //     const response = await createBulkCategoryEntries({
   //       categories: name,
   //     });
-  //     setOptions((prev) => [...prev, response.data]);
+  //     setCategoryOptions((prev) => [...prev, response.data]);
   //   };
 
   return (
-    <MultiSelect options={options} setOptions={setOptions} values={values} />
+    <MultiSelect
+      options={options}
+      setCategoryOptions={setCategoryOptions}
+      values={values}
+      name={name}
+      onChange={onChange}
+    />
   );
 };

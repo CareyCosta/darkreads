@@ -75,6 +75,26 @@ exports.findOne = (req, res) => {
     });
 };
 
+// Find a single Book with an id
+exports.findByGoogleId = async (req, res) => {
+  const googleId = req.params.googleId;
+
+  try {
+    const book = await Book.findOne({ where: { googleId: googleId }, include: Book.categories })
+    if (book) {
+      res.send(book);
+    } else {
+      res.status(404).send({
+        message: `Cannot find Book with googleId=${googleId}.`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      message: err || 'Error retrieving Book with googleId=' + googleId,
+    });
+  }
+};
+
 // Update a Book by the id in the request
 exports.update = (req, res) => {
   const id = req.params.id;
