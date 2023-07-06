@@ -4,8 +4,11 @@ const Book = db.book;
 const Category = db.category;
 
 exports.create = (req, res) => {
+  console.log(req.body);
+  const { name } = req.body;
+
   Category.create({
-    name: req.body.category,
+    name,
   })
     .then((data) => {
       res.send(data);

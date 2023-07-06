@@ -24,6 +24,21 @@ export const createBookEntry = async ({
   return response.data;
 };
 
+export const createCategoryEntry = async ({
+  categoryName,
+}: {
+  categoryName: string;
+}) => {
+  const localInstance = axios.create({
+    baseURL: "http://localhost:5000",
+  });
+
+  console.log(categoryName);
+  return await localInstance.post(`/api/category/`, {
+    name: categoryName,
+  });
+};
+
 export const createBulkCategoryEntries = async ({
   categories,
 }: {
@@ -60,20 +75,6 @@ export const addCategoriesToBook = async (
   return await localInstance.post(`/api/book/addCategories`, {
     categories,
     bookId,
-  });
-};
-
-export const createCategoryEntry = async ({
-  categoryName,
-}: {
-  categoryName: string;
-}) => {
-  const localInstance = axios.create({
-    baseURL: "http://localhost:5000",
-  });
-
-  return await localInstance.post(`/api/category/`, {
-    category: categoryName,
   });
 };
 

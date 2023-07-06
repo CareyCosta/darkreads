@@ -3,15 +3,18 @@ module.exports = (sequelize, Sequelize) => {
     googleId: {
       type: Sequelize.STRING,
       allowNull: false,
+      unique: true,
     },
     subjects: {
       type: Sequelize.JSON,
     },
     ISBN10: {
       type: Sequelize.STRING,
+      unique: true,
     },
     ISBN13: {
       type: Sequelize.STRING,
+      unique: true,
     },
     collectionName: {
       type: Sequelize.STRING,

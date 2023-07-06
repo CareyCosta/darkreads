@@ -1,22 +1,25 @@
-import { useCombobox, useMultipleSelection, useSelect } from "downshift";
-import { useEffect, useMemo, useState } from "react";
+import { useCombobox, useMultipleSelection } from "downshift";
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from "react";
 
 import {
-  createCategoryEntry,
+  createBulkCategoryEntries,
   getAllCategories,
 } from "../components/repository";
 
 type Option = { [key: string]: string };
 
 type MultiSelectProps = {
-  altButtonFunc: ({
-    name,
-    list,
-  }: {
-    name: string;
-    list: Option[];
-  }) => Promise<void>;
+  altButtonFunc?: ({ name }: { name: string }) => Promise<void>;
   options: Option[];
+  setOptions: Dispatch<SetStateAction<Option[]>>;
+  values: Option[] | undefined;
 };
 
 const searchFunction = (option: Option, inputValue: string): boolean => {
@@ -24,9 +27,9 @@ const searchFunction = (option: Option, inputValue: string): boolean => {
   return option.name.toLowerCase().includes(lowerCasedInputValue);
 };
 
-const MultiSelect = ({ options, altButtonFunc }: MultiSelectProps) => {
+const MultiSelect = ({ options, setOptions, values }: MultiSelectProps) => {
   const [inputValue, setInputValue] = useState<string>("");
-  const [selectedItems, setSelectedItems] = useState<Option[]>([]);
+  const [selectedItems, setSelectedItems] = useState<Option[]>(values || []);
 
   const items = useMemo(() => {
     return options.filter((o) => searchFunction(o, inputValue));
@@ -60,6 +63,7 @@ const MultiSelect = ({ options, altButtonFunc }: MultiSelectProps) => {
     getMenuProps,
     getInputProps,
     getItemProps,
+    openMenu,
   } = useCombobox({
     selectedItem: null,
     items,
@@ -104,6 +108,13 @@ const MultiSelect = ({ options, altButtonFunc }: MultiSelectProps) => {
     },
   });
 
+  const addNewOption = (optionName: string): void => {
+    setSelectedItems((prev) => [...prev, { name: optionName }]);
+    setOptions((prev) => [...prev, { name: optionName }]);
+    setInputValue("");
+    openMenu();
+  };
+
   return (
     <div className="w-[592px]">
       <div className="flex flex-col gap-1">
@@ -140,16 +151,18 @@ const MultiSelect = ({ options, altButtonFunc }: MultiSelectProps) => {
               className="w-full"
               {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
             />
-            <button
-              aria-label="toggle menu"
-              className="px-2"
-              type="button"
-              {...getToggleButtonProps({
-                onClick: () => altButtonFunc({ name: inputValue, list: items }),
-              })}
-            >
-              &#8595;
-            </button>
+            {inputValue && !items.length ? (
+              <button onClick={() => addNewOption(inputValue)}>+</button>
+            ) : (
+              <button
+                aria-label="toggle menu"
+                className="px-2"
+                type="button"
+                {...getToggleButtonProps()}
+              >
+                &#8595;
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -175,6 +188,7 @@ const MultiSelect = ({ options, altButtonFunc }: MultiSelectProps) => {
 
 export const CategoryPicker = () => {
   const [options, setOptions] = useState<Option[]>([]);
+  const [values, setValues] = useState<Option[] | undefined>();
 
   useEffect(() => {
     const getCategories = async () => {
@@ -185,19 +199,14 @@ export const CategoryPicker = () => {
     getCategories();
   }, []);
 
-  const createNewCategory = async ({
-    name,
-    list,
-  }: {
-    name: string;
-    list: Option[];
-  }) => {
-    if (!name || list.length) {
-      return;
-    }
-    const response = await createCategoryEntry({ categoryName: name });
-    setOptions((prev) => [...prev, response.data]);
-  };
+  //   const createBulkCategories = async ({ name }: { name: string }) => {
+  //     const response = await createBulkCategoryEntries({
+  //       categories: name,
+  //     });
+  //     setOptions((prev) => [...prev, response.data]);
+  //   };
 
-  return <MultiSelect options={options} altButtonFunc={createNewCategory} />;
+  return (
+    <MultiSelect options={options} setOptions={setOptions} values={values} />
+  );
 };
