@@ -12,7 +12,7 @@ import styles from "./SearchHeader.module.scss";
 const { headerContainer, inputWrapper, searchButton } = styles;
 
 const localStorageState = localStorage.getItem("searchState");
-const initialState = localStorageState ? JSON.parse(localStorageState) : null;
+const initialState = localStorageState ? JSON.parse(localStorageState) : {};
 
 const sortBooks = (booksList: BookProps[], direction: string): BookProps[] => {
   if (direction === "ASC") {
@@ -27,18 +27,17 @@ export const SearchHeader = (props: SearchHeaderProps) => {
 
   const [searchState, setSearchState] =
     useState<SearchStateProps>(initialState);
+
   const [sortConfig, setSortConfig] = useState<SortConfigProps>({
     direction: "ASC",
   });
 
   // get books initially
   useEffect(() => {
-    if (!searchState) {
+    if (!Object.keys(searchState).length) {
       return;
     }
-    getBooks(searchState.title, searchState.author).then((response) =>
-      handleSetBooks(response)
-    );
+    getBooks(searchState).then((response) => handleSetBooks(response));
   }, []);
 
   useEffect(() => {
@@ -60,8 +59,11 @@ export const SearchHeader = (props: SearchHeaderProps) => {
 
   // fetch books with current state parameters
   const handleGetBooks = async () => {
-    const response = await getBooks(searchState.title, searchState.author);
-    handleSetBooks(sortBooks(response, sortConfig.direction));
+    if (!Object.keys(searchState).length) {
+      return;
+    }
+    const response = await getBooks(searchState);
+    handleSetBooks(response);
   };
 
   return (

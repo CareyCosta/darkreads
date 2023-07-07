@@ -2,20 +2,20 @@ import { useState, useEffect } from "react";
 import { useFormik, FormikProps } from "formik";
 
 import { MultiSelect } from "../../BuildingBlocks/MultiSelect/MultiSelect";
-import { LocalBookProps, CategoryProps } from "../types";
+import { LocalBookProps, CategoryProps, BookProps } from "../types";
 import { getAllCategories, createBookEntry } from "../../components/repository";
 
 type NewCategoryProps = Pick<CategoryProps, "name">;
 
 interface BookActionsFormProps {
-  bookId: string | undefined;
-  googleBookId: string;
+  // bookId: string | undefined;
+  googleBookInfo: string;
   categories: CategoryProps[] | undefined;
 }
 
 export const BookActionsForm = ({
-  bookId,
-  googleBookId,
+  // bookId,
+  googleBookInfo,
   categories,
 }: BookActionsFormProps) => {
   const [allCategories, setAllCategoryOptions] = useState<CategoryProps[]>([]);
@@ -30,12 +30,11 @@ export const BookActionsForm = ({
   }, []);
 
   const handleAddToDB = async (categories: CategoryProps[]) => {
-    if (!bookId) {
-      await createBookEntry({
-        googleId: googleBookId,
-        categories,
-      });
-    }
+    await createBookEntry({
+      googleId: googleBookInfo,
+      // ISBN10: googleBookInfo.ISBN,
+      categories,
+    });
   };
 
   const initialValues = {
@@ -50,13 +49,6 @@ export const BookActionsForm = ({
   const handleCategorySelect = (newValues: NewCategoryProps[]) => {
     formik.setFieldValue("categories", newValues);
   };
-
-  //   const createBulkCategories = async ({ name }: { name: string }) => {
-  //     const response = await createBulkCategoryEntries({
-  //       categories: name,
-  //     });
-  //     setAllCategoryOptions((prev) => [...prev, response.data]);
-  //   };
 
   return (
     <form onSubmit={formik.handleSubmit}>

@@ -21,15 +21,12 @@ const getSanitizedDate = (date: Date) => {
 };
 
 export const Books = (props: { booksList: BookProps[] }) => {
-  const [showBookModal, setShowBookModal] = useState<string | null>(null);
+  const [showBookModal, setShowBookModal] = useState<BookProps | null>(null);
   const { booksList } = props;
   return (
     <div className={booksContainer}>
-      {showBookModal && (
-        <BookModal
-          handleShowModal={setShowBookModal}
-          book={booksList.find((b) => b.id === showBookModal)}
-        />
+      {showBookModal !== null && (
+        <BookModal handleShowModal={setShowBookModal} book={showBookModal} />
       )}
       {booksList.length ? (
         booksList.map((b) => (
@@ -39,7 +36,7 @@ export const Books = (props: { booksList: BookProps[] }) => {
               <div>{b.authors}</div>
               <div>{getSanitizedDate(b.publishedDate)}</div>
               <div className={bookDescription}>{b.description}</div>
-              <button onClick={() => setShowBookModal(b.id)}>show modal</button>
+              <button onClick={() => setShowBookModal(b)}>show modal</button>
             </div>
             <div className={imageContainer}>
               <img src={b.imageLink} />

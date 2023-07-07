@@ -19,8 +19,8 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.book = require('./book.model.js')(sequelize, Sequelize);
-db.category = require('./category.model.js')(sequelize, Sequelize);
+db.book = require('./models/book.model')(sequelize, Sequelize);
+db.category = require('./models/category.model')(sequelize, Sequelize);
 
 db.book.categories = db.book.belongsToMany(db.category, { through: 'book_category', as: "categories" });
 db.category.books = db.category.belongsToMany(db.book, { through: 'book_category', as: "books" });

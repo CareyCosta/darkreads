@@ -8,6 +8,11 @@ export type LocalBookProps = {
   categories: CategoryProps[];
 } | null;
 
+type ISBNProps = {
+  ISBN10?: string | undefined;
+  ISBN13?: string | undefined;
+};
+
 export interface BookProps {
   id: string;
   title: string;
@@ -17,11 +22,12 @@ export interface BookProps {
   publishedDate: Date;
   previewLink: string;
   imageLink: string;
+  ISBNs: ISBNProps;
 }
 
 export type SearchStateProps = {
-  title: string;
-  author: string;
+  title: string | undefined;
+  author: string | undefined;
 };
 
 export type SortConfigProps = {
@@ -34,6 +40,6 @@ export type SearchHeaderProps = {
 };
 
 export type BookModalProps = {
-  handleShowModal: Dispatch<SetStateAction<string | null>>;
-  book: BookProps | undefined;
+  handleShowModal: Dispatch<SetStateAction<BookProps | null>>;
+  book: BookProps;
 };

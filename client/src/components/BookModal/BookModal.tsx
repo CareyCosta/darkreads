@@ -17,14 +17,10 @@ const {
 
 export const BookModal = ({ handleShowModal, book }: BookModalProps) => {
   const [localBook, setLocalBook] = useState<LocalBookProps>(null);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, setIsPending] = useState(true);
 
   useEffect(() => {
-    if (!book) {
-      return;
-    }
     const handleGetLocalBook = async (bookId: string) => {
-      setIsPending(true);
       try {
         const response = await getLocalBook(bookId);
         setLocalBook(response.data);
@@ -33,7 +29,7 @@ export const BookModal = ({ handleShowModal, book }: BookModalProps) => {
       }
       setIsPending(false);
     };
-    handleGetLocalBook(book.id);
+    handleGetLocalBook(book?.id);
   }, [book]);
 
   return (
@@ -49,8 +45,8 @@ export const BookModal = ({ handleShowModal, book }: BookModalProps) => {
                 <div>{book?.authors}</div>
                 <div className={bookDescription}>{book.description}</div>
                 <BookActionsForm
-                  googleBookId={book?.id}
-                  bookId={localBook?.id}
+                  googleBookInfo={book.id}
+                  // bookId={localBook?.id}
                   categories={localBook?.categories}
                 />
               </div>

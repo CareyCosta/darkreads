@@ -15,14 +15,11 @@ exports.create = (req, res) => {
   }
 
   // Create a Book
-  const params = {
-    googleId: req.body.googleId,
-    categories: req.body.categories,
-  };
+  const { googleId, ISBN10, ISBN13, categories } = req.body;
 
   // Save Book in the database
   Book.create(
-    { googleId: params.googleId, categories: params.categories },
+    { googleId, ISBN10, ISBN13, categories },
     {
       include: [{ association: Book.categories }],
     }
@@ -80,7 +77,10 @@ exports.findByGoogleId = async (req, res) => {
   const googleId = req.params.googleId;
 
   try {
-    const book = await Book.findOne({ where: { googleId: googleId }, include: Book.categories })
+    const book = await Book.findOne({
+      where: { googleId: googleId },
+      include: Book.categories,
+    });
     if (book) {
       res.send(book);
     } else {
